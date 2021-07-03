@@ -1,6 +1,6 @@
 package com.example.forsaleApp;
+
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -79,50 +79,52 @@ public class RegisterActivity extends AppCompatActivity {
         }
         else
         {
-
-            progressBar.setVisibility(View.VISIBLE);
-            mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NotNull  Task<AuthResult> task) {
-
-                            if (task.isSuccessful())
-                            {
-                                User user = new User(name,email,password);
-
-                                FirebaseDatabase.getInstance().getReference("users")
-                                        .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
-                                        .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NotNull Task<Void> task) {
-
-                                        if (task.isSuccessful())
-                                        {
-                                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                            user.sendEmailVerification();
-                                            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            startActivity(intent);
-                                            Toast.makeText(RegisterActivity.this, "You have been registered successfully, check your email to verify your account", Toast.LENGTH_LONG).show();
-                                        }
-                                        else
-                                        {
-                                            Toast.makeText(RegisterActivity.this, "something wrong happened!", Toast.LENGTH_LONG).show();
-                                            progressBar.setVisibility(View.GONE);
-                                        }
-
-                                    }
-                                });
-                            }
-
-                            else
-                            {
-                                Toast.makeText(RegisterActivity.this, "This email already exists!", Toast.LENGTH_LONG).show();
-                                progressBar.setVisibility(View.GONE);
-                            }
-
-                        }
-                    });
+            validateEmailAddress(name, email, password);
         }
+    }
+
+    private void validateEmailAddress(String name,String email,String password)
+    {
+        progressBar.setVisibility(View.VISIBLE);
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NotNull  Task<AuthResult> task) {
+
+                        if (task.isSuccessful())
+                        {
+                            User user = new User(name,email,password);
+
+                            FirebaseDatabase.getInstance().getReference("users")
+                                    .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+                                    .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NotNull Task<Void> task) {
+
+                                    if (task.isSuccessful())
+                                    {
+                                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                        user.sendEmailVerification();
+                                        finish();
+                                        Toast.makeText(RegisterActivity.this, "You have been registered successfully, check your email to verify your account", Toast.LENGTH_LONG).show();
+                                    }
+                                    else
+                                    {
+                                        Toast.makeText(RegisterActivity.this, "something wrong happened!", Toast.LENGTH_LONG).show();
+                                        progressBar.setVisibility(View.GONE);
+                                    }
+
+                                }
+                            });
+                        }
+
+                        else
+                        {
+                            Toast.makeText(RegisterActivity.this, "This email already exists!", Toast.LENGTH_LONG).show();
+                            progressBar.setVisibility(View.GONE);
+                        }
+
+                    }
+                });
     }
 }

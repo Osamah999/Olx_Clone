@@ -16,27 +16,10 @@
         app:srcCompat="@drawable/login" />
 
     <Button
-        android:id="@+id/main_login_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/main_join_btn"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:background="@drawable/buttons"
-        android:padding="20dp"
-        android:textAllCaps="false"
-        android:textSize="18dp"
-        android:text="Already have an Account? Login"
-        android:textColor="@color/white"
-        />
-
-    <Button
         android:id="@+id/main_join_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/imageView"
-        android:layout_marginTop="200dp"
+        android:layout_above="@id/main_login_btn"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
@@ -46,6 +29,22 @@
         android:textSize="18dp"
         android:text="Create Account"
         android:textColor="@color/purple_200"
+        />
+
+    <Button
+        android:id="@+id/main_login_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="100dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:background="@drawable/buttons"
+        android:padding="20dp"
+        android:textAllCaps="false"
+        android:textSize="18dp"
+        android:text="Already have an Account? Login"
+        android:textColor="@color/white"
         />
 
 

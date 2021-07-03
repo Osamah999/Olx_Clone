@@ -2,7 +2,6 @@ package com.example.forsaleApp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,14 +12,14 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
 import org.jetbrains.annotations.NotNull;
+
+
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -29,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private ProgressBar progressBar;
     private TextView forgotpassword;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,15 +103,14 @@ public class LoginActivity extends AppCompatActivity {
                             user.sendEmailVerification();
                             Toast.makeText(LoginActivity.this, "Check your email to verify your account!", Toast.LENGTH_LONG).show();
                         }
-                        progressBar.setVisibility(View.GONE);
 
 
                     }
                     else
                     {
                         Toast.makeText(LoginActivity.this, "Failed to login! please check your credentials", Toast.LENGTH_SHORT).show();
-                        progressBar.setVisibility(View.GONE);
                     }
+                    progressBar.setVisibility(View.GONE);
                 }
             });
         }
@@ -122,9 +121,15 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (mAuth.getCurrentUser() != null) {
-            startActivity(new Intent(this, HomeActivity.class));
-            finish();
+            assert user != null;
+            if (user.isEmailVerified())
+            {
+                startActivity(new Intent(this, HomeActivity.class));
+                finish();
+
+            }
         }
     }
 }
