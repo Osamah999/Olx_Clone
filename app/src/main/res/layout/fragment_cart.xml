@@ -5,11 +5,40 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.CartFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/cart_title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Cart fragment"
-        android:textSize="30dp"/>
+        android:layout_height="wrap_content"
+        android:text="Card"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:paddingStart="20dp"
+        android:drawableStart="@drawable/cart_24"
+        android:drawablePadding="10dp"
+        android:padding="20sp"/>
+
+
+    <com.google.android.material.tabs.TabLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/cart_title"
+        >
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/products_tab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Products" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/orders_tab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Orders"
+            />
+
+    </com.google.android.material.tabs.TabLayout>
 
 </RelativeLayout>

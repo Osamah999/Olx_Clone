@@ -2,4 +2,11 @@
     <string name="app_name">For Sale</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="description">Description</string>
+    <string name="price">Price</string>
+    <string name="product_name">Product Name</string>
+    <string name="add_product">Add product</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="logout">Logout</string>
 </resources>
