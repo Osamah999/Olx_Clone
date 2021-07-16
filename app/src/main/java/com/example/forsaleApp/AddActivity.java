@@ -46,6 +46,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 
 public class AddActivity extends AppCompatActivity implements LocationListener {
@@ -178,7 +179,6 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
         Intent galleryIntent = new Intent();
         galleryIntent.setType("image/*");
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
         startActivityForResult(Intent.createChooser(galleryIntent, "Select Pictures"), GalleryPick);
 
     }
@@ -251,6 +251,8 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
 
     private void StoreProductInformation()
     {
+        progressDialog.setTitle("Add New Product");
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setMessage("Please wait we are adding the product...");
         progressDialog.show();
 
@@ -293,7 +295,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                             hashMap.put("UserId", "" + firebaseAuth.getUid());
                             //add to db
                             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-                            reference.child(firebaseAuth.getUid()).child("Products").child(timestamp).setValue(hashMap)
+                            reference.child(Objects.requireNonNull(firebaseAuth.getUid())).child("Products").child(timestamp).setValue(hashMap)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {

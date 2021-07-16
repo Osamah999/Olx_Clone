@@ -9,7 +9,7 @@
         android:id="@+id/cart_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Card"
+        android:text="Cart"
         android:textSize="20sp"
         android:textColor="@color/black"
         android:paddingStart="20dp"
@@ -19,26 +19,35 @@
 
 
     <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/cart_title"
-        >
+        />
 
-        <com.google.android.material.tabs.TabItem
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_paper2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/tab_layout"
+            />
+
+
+       <!-- <com.google.android.material.tabs.TabItem
             android:id="@+id/products_tab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Products" />
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/orders_tab"
+            android:id="@+id/favorites_tab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Orders"
-            />
+            android:text="favorites"
+            /> -->
 
-    </com.google.android.material.tabs.TabLayout>
+
 
 </RelativeLayout>
