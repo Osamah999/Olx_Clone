@@ -68,7 +68,7 @@ public class HomeFragment extends Fragment {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        loadAllProducts();
+       // loadAllProducts();
 
         //search
         searchProduct.addTextChangedListener(new TextWatcher() {
@@ -110,12 +110,12 @@ public class HomeFragment extends Fragment {
                                 if (selected.equals("All"))
                                 {
                                     //load all
-                                    loadAllProducts();
+                                    //loadAllProducts();
                                 }
                                 else
                                 {
                                     //load filtered
-                                    loadFilteredProducts(selected);
+                                   // loadFilteredProducts(selected);
                                 }
 
                             }

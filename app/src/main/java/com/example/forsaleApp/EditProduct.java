@@ -34,11 +34,16 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
@@ -48,15 +53,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-
-public class AddActivity extends AppCompatActivity implements LocationListener {
+public class EditProduct extends AppCompatActivity implements LocationListener {
 
     ImageView product_image;
     TextInputEditText product_name, product_category, product_description, product_price;
     TextInputEditText country_ad, state_ad, city_ad, location_ad;
-    Button add_product, get_location;
+    Button update_product, get_location, delete_product;
 
     private String Description, Price, Pname, productCategory, Country, State, City, Location, saveCurrentDate;
+
+    private String ProductId;
 
     private static final int GalleryPick = 1;
     private Uri ImageUri;
@@ -68,11 +74,10 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
     private LocationManager locationManager;
     private double latitude, longitude;
 
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected  void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add);
+        setContentView(R.layout.activity_edit_product);
 
         product_image = findViewById(R.id.product_image);
         product_name = findViewById(R.id.product_name);
@@ -83,18 +88,26 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
         state_ad = findViewById(R.id.state_txt);
         city_ad = findViewById(R.id.city_txt);
         location_ad = findViewById(R.id.location_txt);
-        add_product = findViewById(R.id.add_product);
+        update_product = findViewById(R.id.update_product);
+        delete_product = findViewById(R.id.delete_product);
         get_location = findViewById(R.id.get_location);
+
+        //get id of the product from intent
+        ProductId = getIntent().getStringExtra("ProductId");
 
         firebaseAuth = FirebaseAuth.getInstance();
         progressDialog = new ProgressDialog(this);
 
-        product_image.setOnClickListener(new View.OnClickListener() {
+        loadProductDetails();
+
+        product_image.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View view) {
-                if (ActivityCompat.checkSelfPermission(AddActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+            public void onClick(View view)
+            {
+                if (ActivityCompat.checkSelfPermission(EditProduct.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
                 {
-                    if (ActivityCompat.checkSelfPermission(AddActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
+                    if (ActivityCompat.checkSelfPermission(EditProduct.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
                     {
                         //When permission grated
                         //call method
@@ -102,7 +115,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                     }
                     else
                     {
-                        ActivityCompat.requestPermissions(AddActivity.this, new String[]{Manifest.permission.CAMERA}, 3);
+                        ActivityCompat.requestPermissions(EditProduct.this, new String[]{Manifest.permission.CAMERA}, 3);
                     }
 
                 }
@@ -110,7 +123,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                 {
                     //when permission denied
                     //Request permission
-                    ActivityCompat.requestPermissions(AddActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+                    ActivityCompat.requestPermissions(EditProduct.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
                 }
             }
 
@@ -118,11 +131,10 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
 
         supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.googel_map);
 
-        //check location permission
-        if (ActivityCompat.checkSelfPermission(AddActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(EditProduct.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
         } else {
-            ActivityCompat.requestPermissions(AddActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            ActivityCompat.requestPermissions(EditProduct.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
         }
 
@@ -134,11 +146,20 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
 
         });
 
-        add_product.setOnClickListener(new View.OnClickListener() {
+        update_product.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ValidateProductData();
             }
+        });
+
+        delete_product.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                deleteDialog();
+            }
+
         });
 
         product_category.setFocusable(false);
@@ -149,6 +170,59 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                 categoryDialog();
             }
         });
+
+    }
+
+    private void loadProductDetails()
+    {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+        reference.child(firebaseAuth.getUid()).child("Products").child(ProductId)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot)
+                    {
+                        //get data
+                        String ProductId = ""+snapshot.child("ProductId").getValue();
+                        String ProductImage = ""+snapshot.child("ProductImage").getValue();
+                        String ProductName = ""+snapshot.child("ProductName").getValue();
+                        String ProductCategory = ""+snapshot.child("ProductCategory").getValue();
+                        String ProductDescription = ""+snapshot.child("ProductDescription").getValue();
+                        String ProductPrice = ""+snapshot.child("ProductPrice").getValue();
+                        String Latitude = ""+snapshot.child("Latitude").getValue();
+                        String Longitude = ""+snapshot.child("Longitude").getValue();
+                        String Country = ""+snapshot.child("Country").getValue();
+                        String State = ""+snapshot.child("State").getValue();
+                        String City = ""+snapshot.child("City").getValue();
+                        String Location = ""+snapshot.child("Location").getValue();
+                        String Date = ""+snapshot.child("Date").getValue();
+                        String timestamp = ""+snapshot.child("timestamp").getValue();
+                        String UserId = ""+snapshot.child("UserId").getValue();
+
+
+                        //set data to views
+                        product_name.setText(ProductName);
+                        product_category.setText(ProductCategory);
+                        product_description.setText(ProductDescription);
+                        product_price.setText(ProductPrice);
+                        country_ad.setText(Country);
+                        state_ad.setText(State);
+                        city_ad.setText(City);
+                        location_ad.setText(Location);
+
+                        try {
+                            Picasso.get().load(ProductImage).placeholder(R.drawable.add_image).into(product_image);
+                        }
+                        catch (Exception e)
+                        {
+                            product_image.setImageResource(R.drawable.add_image);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void categoryDialog()
@@ -191,11 +265,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
         Location = location_ad.getText().toString().trim();
 
 
-        if (ImageUri == null)
-        {
-            Toast.makeText(this, "Product image is required!", Toast.LENGTH_LONG).show();
-        }
-        else if (TextUtils.isEmpty(Pname))
+        if (TextUtils.isEmpty(Pname))
         {
             product_name.setError("Please write product name!");
             product_name.requestFocus();
@@ -214,10 +284,6 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
         {
             product_price.setError("Please write your price!");
             product_price.requestFocus();
-        }
-        else if (latitude == 0.0 || longitude == 0.0)
-        {
-            Toast.makeText(this, "Please click on get current location to detect your location!", Toast.LENGTH_LONG).show();
         }
         else if (TextUtils.isEmpty(Country))
         {
@@ -241,100 +307,118 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
         }
         else
         {
-            StoreProductInformation();
+           updateProduct();
         }
     }
 
-    private void StoreProductInformation()
+    private void updateProduct()
     {
-        progressDialog.setTitle("Add New Product");
+        progressDialog.setTitle("Update Product");
         progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setMessage("Please wait we are adding the product...");
+        progressDialog.setMessage("Please wait we are updating the product...");
         progressDialog.show();
 
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat currentDate = new SimpleDateFormat("MMM dd, yyyy");
-        saveCurrentDate = currentDate.format(calendar.getTime());
+        if (ImageUri == null)
+        {
+            //update without image
 
-        String timestamp = "" + System.currentTimeMillis();
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("ProductName", "" + Pname);
+            hashMap.put("ProductCategory", "" + productCategory);
+            hashMap.put("ProductDescription", "" + Description);
+            hashMap.put("ProductPrice", "" + Price);
+            //hashMap.put("Latitude", "" + latitude);
+           // hashMap.put("Longitude", "" + longitude);
+            hashMap.put("Country", "" + Country);
+            hashMap.put("State", "" + State);
+            hashMap.put("City", "" + City);
+            hashMap.put("Location", "" + Location);
 
-        String filePathAndName = "product_images/" + "" + timestamp;
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference(filePathAndName);
-        storageReference.putFile(ImageUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        //image uploaded
-                        //get url of uploaded image
-                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                        while (!uriTask.isSuccessful()) ;
-                        Uri downloadImageUri = uriTask.getResult();
-
-                        if (uriTask.isSuccessful()) {
-                            //url of image received, upload to firebase
-                            //set data to upload
-                            HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("ProductId", "" + timestamp);
-                            hashMap.put("ProductImage", "" + downloadImageUri);
-                            hashMap.put("ProductName", "" + Pname);
-                            hashMap.put("ProductCategory", "" + productCategory);
-                            hashMap.put("ProductDescription", "" + Description);
-                            hashMap.put("ProductPrice", "" + Price);
-                            hashMap.put("Latitude", "" + latitude);
-                            hashMap.put("Longitude", "" + longitude);
-                            hashMap.put("Country", "" + Country);
-                            hashMap.put("State", "" + State);
-                            hashMap.put("City", "" + City);
-                            hashMap.put("Location", "" + Location);
-                            hashMap.put("Date", "" + saveCurrentDate);
-                            hashMap.put("timestamp", "" + timestamp);
-                            hashMap.put("UserId", "" + firebaseAuth.getUid());
-                            //add to db
-                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-                            reference.child(firebaseAuth.getUid()).child("Products").child(timestamp).setValue(hashMap)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            progressDialog.dismiss();
-                                            Toast.makeText(AddActivity.this, "Product added successfully", Toast.LENGTH_LONG).show();
-                                            clearData();
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull @NotNull Exception e) {
-                                            //failed adding to db
-                                            progressDialog.dismiss();
-                                            Toast.makeText(AddActivity.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
-                                        }
-                                    });
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+            reference.child(firebaseAuth.getUid()).child("Products").child(ProductId)
+                    .updateChildren(hashMap)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            progressDialog.dismiss();
+                            EditProduct.this.finish();
+                            Toast.makeText(EditProduct.this, "Product details updated successfully", Toast.LENGTH_LONG).show();
                         }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull @NotNull Exception e) {
-                        //failed uploading image
-                        progressDialog.dismiss();
-                        Toast.makeText(AddActivity.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
-    }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull @NotNull Exception e) {
+                            progressDialog.dismiss();
+                            Toast.makeText(EditProduct.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+        }
+        else
+        {
+            //update with image
 
-    private void clearData()
-    {
-        //clear data after uploading product
-        product_name.setText("");
-        product_category.setText("");
-        product_description.setText("");
-        product_price.setText("");
-        country_ad.setText("");
-        state_ad.setText("");
-        city_ad.setText("");
-        location_ad.setText("");
-        product_image.setImageResource(R.drawable.add_image);
-        product_image = null;
+            //first upload image
+            //image name and path on firebase storage
+            String filePathAndName = "product_images/" + "" + ProductId;//override previous image using same id
+            //upload image
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference(filePathAndName);
+            storageReference.putFile(ImageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
+                        {
+                            //image uploaded, get url of uploaded image
+                            Task<Uri>uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                            while (!uriTask.isSuccessful());
+                            Uri downloadImageUri = uriTask.getResult();
 
+                            if (uriTask.isSuccessful())
+                            {
+                                //setup data in hashmap to update
+                                HashMap<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("ProductImage", "" + downloadImageUri);
+                                hashMap.put("ProductName", "" + Pname);
+                                hashMap.put("ProductCategory", "" + productCategory);
+                                hashMap.put("ProductDescription", "" + Description);
+                                hashMap.put("ProductPrice", "" + Price);
+                                //hashMap.put("Latitude", "" + latitude);
+                                //hashMap.put("Longitude", "" + longitude);
+                                hashMap.put("Country", "" + Country);
+                                hashMap.put("State", "" + State);
+                                hashMap.put("City", "" + City);
+                                hashMap.put("Location", "" + Location);
+
+                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+                                reference.child(firebaseAuth.getUid()).child("Products").child(ProductId)
+                                        .updateChildren(hashMap)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                progressDialog.dismiss();
+                                                EditProduct.this.finish();
+                                                Toast.makeText(EditProduct.this, "Product details updated successfully", Toast.LENGTH_LONG).show();
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull @NotNull Exception e) {
+                                                progressDialog.dismiss();
+                                                Toast.makeText(EditProduct.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                            }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull @NotNull Exception e)
+                        {
+                            //upload failed
+                            progressDialog.dismiss();
+                            Toast.makeText(EditProduct.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+        }
     }
 
     private void getCurrentLocation()
@@ -452,7 +536,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                 {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    alertDialog = new AlertDialog.Builder(AddActivity.this);
+                    alertDialog = new AlertDialog.Builder(EditProduct.this);
                     alertDialog.setTitle("Location permission is required");
                     alertDialog.setMessage("Do you want to open app settings");
                     alertDialog.setCancelable(false);
@@ -468,7 +552,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                     alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            AddActivity.this.finish();
+                            EditProduct.this.finish();
                         }
                     });
                     alertDialog.show();
@@ -480,7 +564,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                 {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    if (ActivityCompat.checkSelfPermission(AddActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
+                    if (ActivityCompat.checkSelfPermission(EditProduct.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
                     {
                         //When permission grated
                         //call method
@@ -488,14 +572,14 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                     }
                     else
                     {
-                        ActivityCompat.requestPermissions(AddActivity.this, new String[]{Manifest.permission.CAMERA}, 3);
+                        ActivityCompat.requestPermissions(EditProduct.this, new String[]{Manifest.permission.CAMERA}, 3);
                     }
                 }
                 else
                 {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    alertDialog = new AlertDialog.Builder(AddActivity.this);
+                    alertDialog = new AlertDialog.Builder(EditProduct.this);
                     alertDialog.setTitle("Storage permission is required");
                     alertDialog.setMessage("Do you want to open app settings");
                     alertDialog.setCancelable(false);
@@ -530,7 +614,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                 {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    alertDialog = new AlertDialog.Builder(AddActivity.this);
+                    alertDialog = new AlertDialog.Builder(EditProduct.this);
                     alertDialog.setTitle("camera permission is required");
                     alertDialog.setMessage("Do you want to open app settings");
                     alertDialog.setCancelable(false);
@@ -555,5 +639,56 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
             break;
 
         }
+    }
+
+    private void deleteDialog()
+    {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(EditProduct.this);
+        alertDialog = new AlertDialog.Builder(EditProduct.this);
+        alertDialog.setTitle("Delete");
+        alertDialog.setMessage("Are you sure you want to delete this product?");
+        alertDialog.setCancelable(false);
+        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteProduct(ProductId);//id is the product id
+            }
+        });
+        alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        alertDialog.show();
+    }
+
+    private void deleteProduct(String productId)
+    {
+        ProgressDialog progressDialog = new ProgressDialog(EditProduct.this);
+        progressDialog.setTitle("delete Product");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setMessage("Please wait we are deleting the product...");
+        progressDialog.show();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+        reference.child(firebaseAuth.getUid()).child("Products").child(productId).removeValue()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        //product deleted
+                        progressDialog.dismiss();
+                        EditProduct.this.finish();
+                        Toast.makeText(EditProduct.this, "Product deleted successfully", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+                        //failed uploading image
+                        progressDialog.dismiss();
+                        Toast.makeText(EditProduct.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }
