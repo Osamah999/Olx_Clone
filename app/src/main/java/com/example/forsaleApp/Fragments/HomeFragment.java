@@ -1,7 +1,6 @@
 package com.example.forsaleApp.Fragments;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -16,14 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.forsaleApp.AdapterProductSeller;
-import com.example.forsaleApp.AddActivity;
+import com.example.forsaleApp.AdapterHomeProducts;
 import com.example.forsaleApp.Constants;
-import com.example.forsaleApp.HomeActivity;
 import com.example.forsaleApp.ModelProduct;
 import com.example.forsaleApp.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,8 +43,8 @@ public class HomeFragment extends Fragment {
 
     private FirebaseAuth firebaseAuth;
 
-    private ArrayList<ModelProduct> productList;
-    private AdapterProductSeller adapterProductSeller;
+    public ArrayList<ModelProduct> productList;
+    public AdapterHomeProducts adapterHomeProducts;
 
     public HomeFragment(){
 
@@ -68,7 +63,7 @@ public class HomeFragment extends Fragment {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-       // loadAllProducts();
+        loadAllProducts();
 
         //search
         searchProduct.addTextChangedListener(new TextWatcher() {
@@ -80,7 +75,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 try {
-                    adapterProductSeller.getFilter().filter(charSequence);
+                    adapterHomeProducts.getFilter().filter(charSequence);
                 }
                 catch (Exception e)
                 {
@@ -110,12 +105,12 @@ public class HomeFragment extends Fragment {
                                 if (selected.equals("All"))
                                 {
                                     //load all
-                                    //loadAllProducts();
+                                    loadAllProducts();
                                 }
                                 else
                                 {
                                     //load filtered
-                                   // loadFilteredProducts(selected);
+                                    loadFilteredProducts(selected);
                                 }
 
                             }
@@ -153,9 +148,9 @@ public class HomeFragment extends Fragment {
 
                         }
                         //set adapter
-                        adapterProductSeller = new AdapterProductSeller(getContext().getApplicationContext(), productList);
+                        adapterHomeProducts = new AdapterHomeProducts(getContext().getApplicationContext(), productList);
                         //set adapter
-                        productRCV.setAdapter(adapterProductSeller);
+                        productRCV.setAdapter(adapterHomeProducts);
                     }
 
                     @Override
@@ -170,14 +165,12 @@ public class HomeFragment extends Fragment {
     {
         productList = new ArrayList<>();
 
-        //get all products
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-        reference.child(Objects.requireNonNull(firebaseAuth.getUid())).child("Products")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Products");
+        reference.orderByKey()
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot)
                     {
-                        //before getting reset list
                         productList.clear();
                         for (DataSnapshot ds: snapshot.getChildren())
                         {
@@ -185,16 +178,16 @@ public class HomeFragment extends Fragment {
                             productList.add(modelProduct);
                         }
                         //set adapter
-                        adapterProductSeller = new AdapterProductSeller(getContext().getApplicationContext(), productList);
+                        adapterHomeProducts = new AdapterHomeProducts(getContext().getApplicationContext(), productList);
                         //set adapter
-                        productRCV.setAdapter(adapterProductSeller);
+                        productRCV.setAdapter(adapterHomeProducts);
                     }
 
                     @Override
-                    public void onCancelled(@NonNull @NotNull DatabaseError error)
-                    {
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
                     }
                 });
+
     }
 }

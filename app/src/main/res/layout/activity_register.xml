@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    tools:context=".RegisterActivity">
+    tools:context=".Activities.RegisterActivity">
 
     <ImageView
         android:id="@+id/register_Photo"

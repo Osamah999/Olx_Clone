@@ -1,4 +1,4 @@
-package com.example.forsaleApp;
+package com.example.forsaleApp.Activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -6,10 +6,12 @@ import androidx.fragment.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+
 import com.example.forsaleApp.Fragments.AccountFragment;
 import com.example.forsaleApp.Fragments.CartFragment;
 import com.example.forsaleApp.Fragments.ChatFragment;
 import com.example.forsaleApp.Fragments.HomeFragment;
+import com.example.forsaleApp.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.jetbrains.annotations.NotNull;
 

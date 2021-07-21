@@ -12,7 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.forsaleApp.MainActivity;
+import com.example.forsaleApp.Activities.MainActivity;
+import com.example.forsaleApp.Activities.forgot_password;
 import com.example.forsaleApp.R;
 import com.example.forsaleApp.User;
 import com.google.android.material.textfield.TextInputEditText;
@@ -29,9 +30,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class AccountFragment extends Fragment {
 
-    private Button logout;
     private TextInputEditText userNameD,userEmailD;
-    private TextView userNameU,userEmailU;
+    private TextView userNameU,userEmailU, logout, resetPassword;
     private FirebaseUser user;
     private DatabaseReference reference;
     private String userID;
@@ -46,7 +46,8 @@ public class AccountFragment extends Fragment {
 
        final View view =  inflater.inflate(R.layout.fragment_account, container, false);
 
-        logout = view.findViewById(R.id.log_out_btn);
+        logout = view.findViewById(R.id.logout_txt);
+        resetPassword = view.findViewById(R.id.reset_txt);
         userNameD = view.findViewById(R.id.user_name_down);
         userEmailD = view.findViewById(R.id.user_email_down);
         userNameU = view.findViewById(R.id.user_name_up);
@@ -76,6 +77,14 @@ public class AccountFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
+            }
+        });
+
+        resetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), forgot_password.class);
+                startActivity(intent);
             }
         });
 

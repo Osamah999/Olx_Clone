@@ -6,10 +6,10 @@ import java.util.ArrayList;
 
 public class FilterProduct extends Filter {
 
-    private AdapterProductSeller adapter;
+    private AdapterHomeProducts adapter;
     private ArrayList<ModelProduct> filterList;
 
-    public FilterProduct(AdapterProductSeller adapter, ArrayList<ModelProduct> filterList) {
+    public FilterProduct(AdapterHomeProducts adapter, ArrayList<ModelProduct> filterList) {
         this.adapter = adapter;
         this.filterList = filterList;
     }

@@ -15,6 +15,4 @@ public class User {
         this.password = password;
     }
 
-    public void sendEmailVerification() {
-    }
 }

@@ -1,4 +1,4 @@
-package com.example.forsaleApp;
+package com.example.forsaleApp.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,6 +8,8 @@ import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import com.example.forsaleApp.R;
 import com.example.forsaleApp.Utility.NetworkChangeListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

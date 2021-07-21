@@ -2,19 +2,22 @@ package com.example.forsaleApp;
 
 public class ModelProduct
 {
-    private String ProductId, ProductImage, ProductName, ProductCategory, ProductDescription, ProductPrice,
-            Latitude, Longitude, Country, State, City, Location, Date, timestamp, UserId;
+    private String Name, Email,Password, ProductId, ProductImage, ProductName, ProductCategory, ProductDescription, ProductPrice,
+            Latitude, Longitude, Country, State, City, Location, Date, timestamp, UserId, Uid;
 
     public ModelProduct()
     {
 
     }
 
-    public ModelProduct(String productId, String productImage, String productName, String productCategory,
-                        String productDescription, String productPrice, String latitude, String longitude,
-                        String country, String state, String city, String location, String date, String timestamp,
-                        String userId)
+    public ModelProduct(String name, String email, String password, String productId, String productImage,
+                        String productName, String productCategory, String productDescription, String productPrice,
+                        String latitude, String longitude, String country, String state, String city, String location,
+                        String date, String timestamp, String userId, String uid)
     {
+        Name = name;
+        Email = email;
+        Password = password;
         ProductId = productId;
         ProductImage = productImage;
         ProductName = productName;
@@ -30,6 +33,39 @@ public class ModelProduct
         Date = date;
         this.timestamp = timestamp;
         UserId = userId;
+        Uid = uid;
+    }
+
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
+
+    public String getEmail() {
+        return Email;
+    }
+
+    public void setEmail(String email) {
+        Email = email;
+    }
+
+    public String getPassword() {
+        return Password;
+    }
+
+    public void setPassword(String password) {
+        Password = password;
+    }
+
+    public String getUid() {
+        return Uid;
+    }
+
+    public void setUid(String uid) {
+        this.Uid = uid;
     }
 
     public String getProductId() {
