@@ -12,9 +12,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-
-import com.example.forsaleApp.Activities.EditProduct;
 import com.example.forsaleApp.Activities.ProductDetails;
 import com.squareup.picasso.Picasso;
 
@@ -24,7 +21,7 @@ import java.util.ArrayList;
 
 public class AdapterHomeProducts extends RecyclerView.Adapter<AdapterHomeProducts.HolderHomeProducts> implements Filterable
 {
-    private Context context;
+    private final Context context;
     public ArrayList<ModelProduct> productList, filterList;
     private FilterProduct filter;
 
@@ -76,15 +73,12 @@ public class AdapterHomeProducts extends RecyclerView.Adapter<AdapterHomeProduct
             holder.productImage.setImageResource(R.drawable.add_image);
         }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //handle item click, show item details
-                // detailsBottomSheet(modelProduct);//here models product contains details of clicked product
-                Intent intent = new Intent(context, ProductDetails.class);
-                intent.putExtra("ProductId", id);
-                context.startActivity(intent);
-            }
+        holder.itemView.setOnClickListener(view -> {
+            //handle item click, show item details
+            Intent intent = new Intent(context, ProductDetails.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("ProductId", id);
+            context.startActivity(intent);
         });
 
     }
@@ -103,10 +97,13 @@ public class AdapterHomeProducts extends RecyclerView.Adapter<AdapterHomeProduct
         return filter;
     }
 
-    class HolderHomeProducts extends RecyclerView.ViewHolder
+    static class HolderHomeProducts extends RecyclerView.ViewHolder
     {
-        private ImageView productImage;
-        private TextView product_Name, product_Description, product_Price, date;
+        private final ImageView productImage;
+        private final TextView product_Name;
+        private final TextView product_Description;
+        private final TextView product_Price;
+        private final TextView date;
 
         public HolderHomeProducts(@NonNull @NotNull View itemView) {
             super(itemView);

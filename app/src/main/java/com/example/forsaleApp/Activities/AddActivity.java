@@ -10,12 +10,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 
 import com.example.forsaleApp.Constants;
 import com.example.forsaleApp.R;
+import com.example.forsaleApp.Utility.NetworkChangeListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -297,25 +300,26 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {
-                                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-                                            reference.child("Products").child(timestamp).setValue(hashMap)
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void unused) {
-                                                            progressDialog.dismiss();
-                                                            Toast.makeText(AddActivity.this, "Product added successfully", Toast.LENGTH_LONG).show();
-                                                            clearData();
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull @NotNull Exception e) {
-                                                            //failed adding to db
-                                                            progressDialog.dismiss();
-                                                            Toast.makeText(AddActivity.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
-                                                        }
-                                                    });
 
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull @NotNull Exception e) {
+                                            //failed adding to db
+                                            progressDialog.dismiss();
+                                            Toast.makeText(AddActivity.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+                            databaseReference.child("Products").child(timestamp).setValue(hashMap)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            progressDialog.dismiss();
+                                            Toast.makeText(AddActivity.this, "Product added successfully", Toast.LENGTH_LONG).show();
+                                            clearData();
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
@@ -573,5 +577,20 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
             break;
 
         }
+    }
+
+    NetworkChangeListener networkChangeListener = new NetworkChangeListener();
+
+    @Override
+    protected void onStart() {
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeListener, filter);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(networkChangeListener);
+        super.onStop();
     }
 }

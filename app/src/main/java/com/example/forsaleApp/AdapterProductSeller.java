@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class AdapterProductSeller extends RecyclerView.Adapter<AdapterProductSeller.HolderProductSeller>
 {
-    private Context context;
+    private final Context context;
     public ArrayList<ModelProduct> productList;
 
     public AdapterProductSeller(Context context, ArrayList<ModelProduct> productList) {
@@ -62,15 +62,12 @@ public class AdapterProductSeller extends RecyclerView.Adapter<AdapterProductSel
             holder.productImage.setImageResource(R.drawable.add_image);
         }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //handle item click, show item details
-               // detailsBottomSheet(modelProduct);//here models product contains details of clicked product
-                Intent intent = new Intent(context, EditProduct.class);
-                intent.putExtra("ProductId", id);
-                context.startActivity(intent);
-            }
+        holder.itemView.setOnClickListener(view -> {
+            //handle item click, show item details
+            Intent intent = new Intent(context, EditProduct.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("ProductId", id);
+            context.startActivity(intent);
         });
 
     }
@@ -81,10 +78,13 @@ public class AdapterProductSeller extends RecyclerView.Adapter<AdapterProductSel
     }
 
 
-    class HolderProductSeller extends RecyclerView.ViewHolder
+    static class HolderProductSeller extends RecyclerView.ViewHolder
     {
-        private ImageView productImage;
-        private TextView product_Name, product_Description, product_Price, date;
+        private final ImageView productImage;
+        private final TextView product_Name;
+        private final TextView product_Description;
+        private final TextView product_Price;
+        private final TextView date;
 
         public HolderProductSeller(@NonNull @NotNull View itemView) {
             super(itemView);

@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -12,6 +14,7 @@ import com.example.forsaleApp.Fragments.CartFragment;
 import com.example.forsaleApp.Fragments.ChatFragment;
 import com.example.forsaleApp.Fragments.HomeFragment;
 import com.example.forsaleApp.R;
+import com.example.forsaleApp.Utility.NetworkChangeListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +36,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new
-            BottomNavigationView.OnNavigationItemSelectedListener() {
+            BottomNavigationView.OnNavigationItemSelectedListener()
+            {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
                     Fragment selectedFragment = null;
@@ -61,4 +65,19 @@ public class HomeActivity extends AppCompatActivity {
                     return true;
                 }
             };
+
+    NetworkChangeListener networkChangeListener = new NetworkChangeListener();
+
+    @Override
+    protected void onStart() {
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeListener, filter);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(networkChangeListener);
+        super.onStop();
+    }
 }

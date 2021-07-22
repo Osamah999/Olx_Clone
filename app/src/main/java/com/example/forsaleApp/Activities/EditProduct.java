@@ -10,12 +10,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -28,6 +30,7 @@ import com.example.forsaleApp.AdapterHomeProducts;
 import com.example.forsaleApp.Constants;
 import com.example.forsaleApp.ModelProduct;
 import com.example.forsaleApp.R;
+import com.example.forsaleApp.Utility.NetworkChangeListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -55,8 +58,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
-public class EditProduct extends AppCompatActivity implements LocationListener {
+public class EditProduct extends AppCompatActivity implements LocationListener, OnMapReadyCallback{
 
     ImageView product_image;
     TextInputEditText product_name, product_category, product_description, product_price;
@@ -94,6 +98,11 @@ public class EditProduct extends AppCompatActivity implements LocationListener {
         update_product = findViewById(R.id.update_product);
         delete_product = findViewById(R.id.delete_product);
         get_location = findViewById(R.id.get_location);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.googel_map);
+        assert mapFragment != null;
+        mapFragment.getMapAsync(this);
 
         //get id of the product from intent
         ProductId = getIntent().getStringExtra("ProductId");
@@ -330,40 +339,42 @@ public class EditProduct extends AppCompatActivity implements LocationListener {
             hashMap.put("ProductCategory", "" + productCategory);
             hashMap.put("ProductDescription", "" + Description);
             hashMap.put("ProductPrice", "" + Price);
-            //hashMap.put("Latitude", "" + latitude);
-           // hashMap.put("Longitude", "" + longitude);
+            hashMap.put("Latitude", "" + latitude);
+            hashMap.put("Longitude", "" + longitude);
             hashMap.put("Country", "" + Country);
             hashMap.put("State", "" + State);
             hashMap.put("City", "" + City);
             hashMap.put("Location", "" + Location);
 
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-            reference.child(firebaseAuth.getUid()).child("Products").child(ProductId)
+            reference.child(Objects.requireNonNull(firebaseAuth.getUid())).child("Products").child(ProductId)
                     .updateChildren(hashMap)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-                            reference.child("Products").child(ProductId)
-                                    .updateChildren(hashMap)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused)
-                                        {
-                                            progressDialog.dismiss();
-                                            Intent intent = new Intent(EditProduct.this, HomeActivity.class);
-                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            startActivity(intent);
-                                            Toast.makeText(EditProduct.this, "Product details updated successfully", Toast.LENGTH_LONG).show();
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull @NotNull Exception e) {
-                                            progressDialog.dismiss();
-                                            Toast.makeText(EditProduct.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
-                                        }
-                                    });
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull @NotNull Exception e) {
+                            progressDialog.dismiss();
+                            Toast.makeText(EditProduct.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+            databaseReference.child("Products").child(ProductId)
+                    .updateChildren(hashMap)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused)
+                        {
+                            progressDialog.dismiss();
+                            Intent intent = new Intent(EditProduct.this, HomeActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            Toast.makeText(EditProduct.this, "Product details updated successfully", Toast.LENGTH_LONG).show();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -402,42 +413,43 @@ public class EditProduct extends AppCompatActivity implements LocationListener {
                                 hashMap.put("ProductCategory", "" + productCategory);
                                 hashMap.put("ProductDescription", "" + Description);
                                 hashMap.put("ProductPrice", "" + Price);
-                                //hashMap.put("Latitude", "" + latitude);
-                                //hashMap.put("Longitude", "" + longitude);
+                                hashMap.put("Latitude", "" + latitude);
+                                hashMap.put("Longitude", "" + longitude);
                                 hashMap.put("Country", "" + Country);
                                 hashMap.put("State", "" + State);
                                 hashMap.put("City", "" + City);
                                 hashMap.put("Location", "" + Location);
 
                                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-                                reference.child(firebaseAuth.getUid()).child("Products").child(ProductId)
+                                reference.child(Objects.requireNonNull(firebaseAuth.getUid())).child("Products").child(ProductId)
                                         .updateChildren(hashMap)
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void unused)
                                             {
-                                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-                                                reference.child("Products").child(ProductId)
-                                                        .updateChildren(hashMap)
-                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void unused)
-                                                            {
-                                                                progressDialog.dismiss();
-                                                                Intent intent = new Intent(EditProduct.this, HomeActivity.class);
-                                                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                startActivity(intent);
-                                                                Toast.makeText(EditProduct.this, "Product details updated successfully", Toast.LENGTH_LONG).show();
-                                                            }
-                                                        })
-                                                        .addOnFailureListener(new OnFailureListener() {
-                                                            @Override
-                                                            public void onFailure(@NonNull @NotNull Exception e) {
-                                                                progressDialog.dismiss();
-                                                                Toast.makeText(EditProduct.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
-                                                            }
-                                                        });
 
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull @NotNull Exception e) {
+                                                progressDialog.dismiss();
+                                                Toast.makeText(EditProduct.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+                                databaseReference.child("Products").child(ProductId)
+                                        .updateChildren(hashMap)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused)
+                                            {
+                                                progressDialog.dismiss();
+                                                Intent intent = new Intent(EditProduct.this, HomeActivity.class);
+                                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                startActivity(intent);
+                                                Toast.makeText(EditProduct.this, "Product details updated successfully", Toast.LENGTH_LONG).show();
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
@@ -480,29 +492,58 @@ public class EditProduct extends AppCompatActivity implements LocationListener {
     }
 
     @Override
+    public void onMapReady(@NonNull @NotNull GoogleMap googleMap)
+    {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+        reference.child(firebaseAuth.getUid()).child("Products").child(ProductId)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        //get data
+                        String lat = snapshot.child("Latitude").getValue().toString();
+                        String lng = snapshot.child("Longitude").getValue().toString();
+
+                        double latitude =Double.parseDouble(lat);
+                        double longitude =Double.parseDouble(lng);
+
+                        //Initialize lat and lng
+                        LatLng latLng = new LatLng(latitude,longitude);
+                        //create marker options
+                        MarkerOptions options = new MarkerOptions().position(latLng);
+                        //zoom map
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,11));
+                        //add marker on map
+                        googleMap.addMarker(options);
+
+                    }
+                    @Override
+                    public void onCancelled (@NonNull @NotNull DatabaseError error){
+
+                    }
+                });
+    }
+
+    @Override
     public void onLocationChanged(@NonNull Location location)
     {
         //location detected
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
-        if (location != null)
-        {
-            supportMapFragment.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(@NonNull @NotNull GoogleMap googleMap)
-                {
-                    //Initialize lat and lng
-                    LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
-                    //create marker options
-                    MarkerOptions options = new MarkerOptions().position(latLng).title("You are here");
-                    //zoom map
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,11));
-                    //add marker on map
-                    googleMap.addMarker(options);
-                }
-            });
-        }
+        supportMapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull @NotNull GoogleMap googleMap)
+            {
+                //Initialize lat and lng
+                LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+                //create marker options
+                MarkerOptions options = new MarkerOptions().position(latLng).title("You are here");
+                //zoom map
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,11));
+                //add marker on map
+                googleMap.addMarker(options);
+            }
+        });
 
         findAddress();
         locationManager.removeUpdates(this);
@@ -718,30 +759,6 @@ public class EditProduct extends AppCompatActivity implements LocationListener {
                     @Override
                     public void onSuccess(Void unused)
                     {
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-                        reference.child("Products").child(productId).removeValue()
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused)
-                            {
-                                //product deleted
-                                progressDialog.dismiss();
-                               // EditProduct.this.finish();
-                                Intent intent = new Intent(EditProduct.this, HomeActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-                                Toast.makeText(EditProduct.this, "Product deleted successfully", Toast.LENGTH_LONG).show();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull @NotNull Exception e)
-                            {
-                                //failed uploading image
-                                progressDialog.dismiss();
-                                Toast.makeText(EditProduct.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        }) ;
 
                     }
                 })
@@ -753,5 +770,45 @@ public class EditProduct extends AppCompatActivity implements LocationListener {
                         Toast.makeText(EditProduct.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("Products").child(productId).removeValue()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused)
+                    {
+                        //product deleted
+                        progressDialog.dismiss();
+                        // EditProduct.this.finish();
+                        Intent intent = new Intent(EditProduct.this, HomeActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        Toast.makeText(EditProduct.this, "Product deleted successfully", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e)
+                    {
+                        //failed uploading image
+                        progressDialog.dismiss();
+                        Toast.makeText(EditProduct.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }) ;
     }
+
+    NetworkChangeListener networkChangeListener = new NetworkChangeListener();
+
+    @Override
+    protected void onStart() {
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeListener, filter);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(networkChangeListener);
+        super.onStop();
+    }
+
 }
