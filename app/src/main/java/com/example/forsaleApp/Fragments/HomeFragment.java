@@ -127,8 +127,8 @@ public class HomeFragment extends Fragment {
         productList = new ArrayList<>();
 
         //get all products
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-        reference.child(Objects.requireNonNull(firebaseAuth.getUid())).child("Products")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        reference.child("Products")
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot)

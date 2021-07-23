@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.View;;
 import android.widget.Button;
@@ -37,6 +39,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -67,11 +70,12 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
     TextInputEditText country_ad, state_ad, city_ad, location_ad;
     Button update_product, get_location, delete_product;
 
-    private String Description, Price, Pname, productCategory, Country, State, City, Location, saveCurrentDate;
+    private String Description, Price, Pname, productCategory, Country, State, City, Location;
 
     private String ProductId;
 
     private static final int GalleryPick = 1;
+    private static final int CameraPick = 3;
     private Uri ImageUri;
 
     private FirebaseAuth firebaseAuth;
@@ -123,7 +127,7 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
                     {
                         //When permission grated
                         //call method
-                        OpenGallery();
+                        ShowImagePickDialog();;
                     }
                     else
                     {
@@ -256,6 +260,43 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
                 .show();
     }
 
+    private void ShowImagePickDialog()
+    {
+        String[] options = {"Camera", "Gallery"};
+        //Dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pick Image")
+                .setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i)
+                    {
+                        if (i == 0)
+                        {
+                            PickFromCamera();
+                        }
+                        else
+                        {
+                            OpenGallery();
+                        }
+                    }
+                })
+                .show();
+    }
+
+    private void PickFromCamera()
+    {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.Images.Media.TITLE, "Temp_Image_Title");
+        contentValues.put(MediaStore.Images.Media.DESCRIPTION, "Temp_Image_Description");
+
+        ImageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, ImageUri);
+        startActivityForResult(intent, CameraPick);
+
+    }
+
     private void OpenGallery()
     {
         Intent galleryIntent = new Intent();
@@ -339,8 +380,8 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
             hashMap.put("ProductCategory", "" + productCategory);
             hashMap.put("ProductDescription", "" + Description);
             hashMap.put("ProductPrice", "" + Price);
-            hashMap.put("Latitude", "" + latitude);
-            hashMap.put("Longitude", "" + longitude);
+            //hashMap.put("Latitude", "" + latitude);
+            //hashMap.put("Longitude", "" + longitude);
             hashMap.put("Country", "" + Country);
             hashMap.put("State", "" + State);
             hashMap.put("City", "" + City);
@@ -413,8 +454,8 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
                                 hashMap.put("ProductCategory", "" + productCategory);
                                 hashMap.put("ProductDescription", "" + Description);
                                 hashMap.put("ProductPrice", "" + Price);
-                                hashMap.put("Latitude", "" + latitude);
-                                hashMap.put("Longitude", "" + longitude);
+                                //hashMap.put("Latitude", "" + latitude);
+                                //hashMap.put("Longitude", "" + longitude);
                                 hashMap.put("Country", "" + Country);
                                 hashMap.put("State", "" + State);
                                 hashMap.put("City", "" + City);
@@ -589,13 +630,18 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data)
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == GalleryPick && resultCode == RESULT_OK && data != null)
+        if (requestCode == GalleryPick && resultCode == RESULT_OK)
         {
             ImageUri = data.getData();
+            product_image.setImageURI(ImageUri);
+        }
+        if (requestCode == CameraPick && resultCode == RESULT_OK)
+        {
+            //ImageUri = data.getData();
             product_image.setImageURI(ImageUri);
         }
 
@@ -650,7 +696,7 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
                     {
                         //When permission grated
                         //call method
-                        OpenGallery();
+                        ShowImagePickDialog();
                     }
                     else
                     {
@@ -690,7 +736,7 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
                 {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    OpenGallery();
+                    ShowImagePickDialog();
                 }
                 else
                 {

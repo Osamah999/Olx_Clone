@@ -9,7 +9,7 @@
         android:id="@+id/cart_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cart"
+        android:text="My Ads"
         android:textSize="20sp"
         android:textColor="@color/black"
         android:paddingStart="20dp"

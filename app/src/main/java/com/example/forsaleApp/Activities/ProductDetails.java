@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ProductDetails extends AppCompatActivity implements OnMapReadyCallback{
 
-    private TextView Product_Name, Product_Description, Product_Price, Product_Location;
+    private TextView Product_Name, Product_Description, Product_Price, Product_Location, User_Name, date;
     private ImageView Product_Image;
     private Button Chat_btn, Favorite_btn;
 
@@ -46,6 +46,8 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
         Product_Description = findViewById(R.id.product_description);
         Product_Price = findViewById(R.id.product_price);
         Product_Location = findViewById(R.id.location_txt);
+        User_Name = findViewById(R.id.user_name);
+        date = findViewById(R.id.date);
         Chat_btn = findViewById(R.id.chat_btn);
         Favorite_btn = findViewById(R.id.favorite_btn);
 
@@ -78,6 +80,7 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
                         String Date = ""+snapshot.child("Date").getValue();
                         String timestamp = ""+snapshot.child("timestamp").getValue();
                         String UserId = ""+snapshot.child("UserId").getValue();
+                        String UserName = ""+snapshot.child("UserName").getValue();
 
 
                         //set data to views
@@ -85,6 +88,8 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
                         Product_Description.setText(ProductDescription);
                         Product_Price.setText("₹"+ProductPrice);
                         Product_Location.setText(Location);
+                        User_Name.setText(UserName);
+                        date.setText(Date);
 
                         try {
                             Picasso.get().load(ProductImage).placeholder(R.drawable.add_image).into(Product_Image);

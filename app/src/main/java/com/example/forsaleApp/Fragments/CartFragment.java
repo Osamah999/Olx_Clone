@@ -38,7 +38,7 @@ public class CartFragment extends Fragment {
         adapter = new FragmentAdapter(fm, getLifecycle());
         pager2.setAdapter(adapter);
 
-        tabLayout.addTab(tabLayout.newTab().setText("Products"));
+        tabLayout.addTab(tabLayout.newTab().setText("ADS"));
         tabLayout.addTab(tabLayout.newTab().setText("Favorites"));
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

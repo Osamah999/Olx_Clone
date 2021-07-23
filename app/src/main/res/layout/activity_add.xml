@@ -44,7 +44,7 @@
                 />
 
             <ImageView
-                android:id="@+id/product_image"
+                android:id="@+id/product_Image"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:layout_marginTop="40dp"
@@ -274,6 +274,13 @@
             android:text="@string/add_product"
             android:textColor="@color/white"
             />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:visibility="invisible"/>
 
     </LinearLayout>
 

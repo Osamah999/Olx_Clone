@@ -1,5 +1,6 @@
 package com.example.forsaleApp.Activities;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -7,11 +8,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -20,14 +23,17 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.View;;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.forsaleApp.Constants;
 import com.example.forsaleApp.R;
+import com.example.forsaleApp.User;
 import com.example.forsaleApp.Utility.NetworkChangeListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,8 +46,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -57,13 +66,15 @@ import java.util.Locale;
 public class AddActivity extends AppCompatActivity implements LocationListener {
 
     ImageView product_image;
+    TextView user_name;
     TextInputEditText product_name, product_category, product_description, product_price;
     TextInputEditText country_ad, state_ad, city_ad, location_ad;
     Button add_product, get_location;
 
-    private String Description, Price, Pname, productCategory, Country, State, City, Location, saveCurrentDate;
+    private String Description, Price, Pname, productCategory, Country, State, City, Location, saveCurrentDate, userName;
 
     private static final int GalleryPick = 1;
+    private static final int CameraPick = 3;
     private Uri ImageUri;
 
     private FirebaseAuth firebaseAuth;
@@ -79,7 +90,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
 
-        product_image = findViewById(R.id.product_image);
+        product_image = findViewById(R.id.product_Image);
         product_name = findViewById(R.id.product_name);
         product_category = findViewById(R.id.category);
         product_description = findViewById(R.id.product_description);
@@ -90,9 +101,27 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
         location_ad = findViewById(R.id.location_txt);
         add_product = findViewById(R.id.add_product);
         get_location = findViewById(R.id.get_location);
+        user_name = findViewById(R.id.user_name);
 
         firebaseAuth = FirebaseAuth.getInstance();
         progressDialog = new ProgressDialog(this);
+
+        DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference("users");
+        databaseReference1.child(firebaseAuth.getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot)
+                    {
+                        String UserName = ""+snapshot.child("name").getValue();
+
+                        user_name.setText(UserName);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
 
         product_image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,7 +132,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                     {
                         //When permission grated
                         //call method
-                        OpenGallery();
+                        ShowImagePickDialog();
                     }
                     else
                     {
@@ -175,12 +204,49 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                 .show();
     }
 
+    private void ShowImagePickDialog()
+    {
+        String[] options = {"Camera", "Gallery"};
+        //Dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pick Image")
+                .setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i)
+                    {
+                        if (i == 0)
+                        {
+                            PickFromCamera();
+                        }
+                        else
+                        {
+                            OpenGallery();
+                        }
+                    }
+                })
+                .show();
+    }
+
     private void OpenGallery()
     {
         Intent galleryIntent = new Intent();
         galleryIntent.setType("image/*");
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(galleryIntent, "Select Pictures"), GalleryPick);
+
+    }
+
+    private void PickFromCamera()
+    {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.Images.Media.TITLE, "Temp_Image_Title");
+        contentValues.put(MediaStore.Images.Media.DESCRIPTION, "Temp_Image_Description");
+
+        ImageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, ImageUri);
+        startActivityForResult(intent, CameraPick);
 
     }
 
@@ -194,6 +260,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
         State = state_ad.getText().toString().trim();
         City = city_ad.getText().toString().trim();
         Location = location_ad.getText().toString().trim();
+        userName = user_name.getText().toString().trim();
 
 
         if (ImageUri == null)
@@ -276,6 +343,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                         Uri downloadImageUri = uriTask.getResult();
 
                         if (uriTask.isSuccessful()) {
+
                             //url of image received, upload to firebase
                             //set data to upload
                             HashMap<String, Object> hashMap = new HashMap<>();
@@ -294,6 +362,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                             hashMap.put("Date", "" + saveCurrentDate);
                             hashMap.put("timestamp", "" + timestamp);
                             hashMap.put("UserId", "" + firebaseAuth.getUid());
+                            hashMap.put("UserName", ""+ userName);
                             //add to db
                             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
                             reference.child(firebaseAuth.getUid()).child("Products").child(timestamp).setValue(hashMap)
@@ -445,13 +514,18 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data)
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == GalleryPick && resultCode == RESULT_OK && data != null)
+        if (requestCode == GalleryPick && resultCode == RESULT_OK)
         {
             ImageUri = data.getData();
+            product_image.setImageURI(ImageUri);
+        }
+        if (requestCode == CameraPick && resultCode == RESULT_OK)
+        {
+            //ImageUri = data.getData();
             product_image.setImageURI(ImageUri);
         }
 
@@ -506,7 +580,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                     {
                         //When permission grated
                         //call method
-                        OpenGallery();
+                        ShowImagePickDialog();
                     }
                     else
                     {
@@ -546,7 +620,7 @@ public class AddActivity extends AppCompatActivity implements LocationListener {
                 {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    OpenGallery();
+                    ShowImagePickDialog();
                 }
                 else
                 {
