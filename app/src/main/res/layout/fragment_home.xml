@@ -9,10 +9,7 @@
     android:focusable="true"
     tools:context=".Fragments.HomeFragment">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -55,20 +52,22 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginBottom="5dp"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/product_rcv"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/filter_producttxt"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/row_product_seller"
-                />
+                >
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/product_rcv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/row_home_products"
+                    />
+
+            </FrameLayout>
 
         </RelativeLayout>
-
-    </ScrollView>
-
-
-
 
 </LinearLayout>

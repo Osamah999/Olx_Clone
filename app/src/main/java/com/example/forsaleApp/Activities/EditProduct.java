@@ -347,7 +347,7 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
             hashMap.put("Location", "" + Location);
 
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-            reference.child(Objects.requireNonNull(firebaseAuth.getUid())).child("Products").child(ProductId)
+            reference.child(firebaseAuth.getUid()).child("Products").child(ProductId)
                     .updateChildren(hashMap)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -372,7 +372,7 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
                         {
                             progressDialog.dismiss();
                             Intent intent = new Intent(EditProduct.this, HomeActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                             Toast.makeText(EditProduct.this, "Product details updated successfully", Toast.LENGTH_LONG).show();
                         }
@@ -421,7 +421,7 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
                                 hashMap.put("Location", "" + Location);
 
                                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-                                reference.child(Objects.requireNonNull(firebaseAuth.getUid())).child("Products").child(ProductId)
+                                reference.child(firebaseAuth.getUid()).child("Products").child(ProductId)
                                         .updateChildren(hashMap)
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
@@ -447,7 +447,7 @@ public class EditProduct extends AppCompatActivity implements LocationListener, 
                                             {
                                                 progressDialog.dismiss();
                                                 Intent intent = new Intent(EditProduct.this, HomeActivity.class);
-                                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                 startActivity(intent);
                                                 Toast.makeText(EditProduct.this, "Product details updated successfully", Toast.LENGTH_LONG).show();
                                             }
