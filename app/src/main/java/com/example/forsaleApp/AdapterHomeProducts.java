@@ -56,6 +56,8 @@ public class AdapterHomeProducts extends RecyclerView.Adapter<AdapterHomeProduct
         String productDescription = modelHomeProducts.getProductDescription();
         String productCategory = modelHomeProducts.getProductCategory();
         String productPrice = modelHomeProducts.getProductPrice();
+        String latitude = modelHomeProducts.getLatitude();
+        String longitude = modelHomeProducts.getLongitude();
         String timestamp = modelHomeProducts.getTimestamp();
         String Date = modelHomeProducts.getDate();
         String uid = modelHomeProducts.getUid();
@@ -78,6 +80,10 @@ public class AdapterHomeProducts extends RecyclerView.Adapter<AdapterHomeProduct
             Intent intent = new Intent(context, ProductDetails.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("ProductId", id);
+            intent.putExtra("Latitude", latitude);
+            intent.putExtra("Longitude", longitude);
+            intent.putExtra("UserId", userid);
+            intent.putExtra("ProductImage", productImage);
             context.startActivity(intent);
         });
 

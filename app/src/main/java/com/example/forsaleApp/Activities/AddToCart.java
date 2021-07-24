@@ -2,18 +2,16 @@ package com.example.forsaleApp.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.forsaleApp.R;
 import com.example.forsaleApp.Utility.NetworkChangeListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,42 +22,30 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
-
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-
-public class ProductDetails extends AppCompatActivity implements OnMapReadyCallback{
+public class AddToCart extends AppCompatActivity implements OnMapReadyCallback {
 
     private TextView Product_Name, Product_Description, Product_Price, Product_Location, User_Name, date;
     private ImageView Product_Image;
-    private Button Chat_btn, Favorite_btn;
+    private Button Chat_btn, Remove_btn;
 
-    private String ProductId, ProductImage, Latitude, Longitude, UserId;
+    private String ProductId;
 
     private ProgressDialog progressDialog;
     private FirebaseAuth firebaseAuth;
 
-    private String Description, Price, Pname, Location, ProductDate, userName;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_product_details);
+        setContentView(R.layout.activity_add_to_cart);
 
         Product_Image = findViewById(R.id.product_image);
         Product_Name = findViewById(R.id.product_name);
@@ -69,7 +55,7 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
         User_Name = findViewById(R.id.user_name);
         date = findViewById(R.id.date);
         Chat_btn = findViewById(R.id.chat_btn);
-        Favorite_btn = findViewById(R.id.favorite_btn);
+        Remove_btn = findViewById(R.id.remove_btn);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.googel_map);
@@ -78,28 +64,24 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
 
         //get id of the product from intent
         ProductId = getIntent().getStringExtra("ProductId");
-        ProductImage = getIntent().getStringExtra("ProductImage");
-        Latitude = getIntent().getStringExtra("Latitude");
-        Longitude = getIntent().getStringExtra("Longitude");
-        UserId = getIntent().getStringExtra("UserId");
 
         firebaseAuth = FirebaseAuth.getInstance();
         progressDialog = new ProgressDialog(this);
 
         loadProductDetails();
 
-        Favorite_btn.setOnClickListener(new View.OnClickListener() {
+        Remove_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AddToCart();
+                RemoveFromCart();
             }
         });
     }
 
     private void loadProductDetails()
     {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        reference.child("Products").child(ProductId)
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+        reference.child(firebaseAuth.getUid()).child("Cart").child(ProductId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot)
@@ -147,8 +129,8 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
     @Override
     public void onMapReady(@NonNull @NotNull GoogleMap googleMap)
     {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        reference.child("Products").child(ProductId)
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+        reference.child(firebaseAuth.getUid()).child("Cart").child(ProductId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -176,48 +158,33 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
                 });
     }
 
-    private void AddToCart()
+    private void RemoveFromCart()
     {
-        progressDialog.setTitle("Add to favorite");
+        progressDialog.setTitle("Remove Product");
         progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setMessage("Please wait we are adding the product...");
+        progressDialog.setMessage("Please wait we are Removing the product...");
         progressDialog.show();
-
-        Pname = Product_Name.getText().toString().trim();
-        Description = Product_Description.getText().toString().trim();
-        Price = Product_Price.getText().toString().trim();
-        Location = Product_Location.getText().toString().trim();
-        userName = User_Name.getText().toString().trim();
-        ProductDate = date.getText().toString().trim();
-
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("ProductId", "" + ProductId);
-        hashMap.put("ProductImage", ""+ProductImage);
-        hashMap.put("ProductName", "" + Pname);
-        hashMap.put("ProductDescription", "" + Description);
-        hashMap.put("ProductPrice", "" + Price);
-        hashMap.put("Latitude", "" + Latitude);
-        hashMap.put("Longitude", "" + Longitude);
-        hashMap.put("Location", "" + Location);
-        hashMap.put("Date", "" + ProductDate);
-        hashMap.put("UserId", "" + UserId);
-        hashMap.put("UserName", ""+ userName);
-        //add to db
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-        reference.child(firebaseAuth.getUid()).child("Cart").child(ProductId).setValue(hashMap)
+        reference.child(firebaseAuth.getUid()).child("Cart").child(ProductId).removeValue()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onSuccess(Void unused) {
+                    public void onSuccess(Void unused)
+                    {
+                        //product deleted
                         progressDialog.dismiss();
-                        Toast.makeText(ProductDetails.this, "Product added successfully!", Toast.LENGTH_LONG).show();
-
+                        // EditProduct.this.finish();
+                        Intent intent = new Intent(AddToCart.this, HomeActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        Toast.makeText(AddToCart.this, "Product removed successfully", Toast.LENGTH_LONG).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull @NotNull Exception e) {
-                        //failed adding to db
+                        //failed uploading image
                         progressDialog.dismiss();
+                        Toast.makeText(AddToCart.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -236,6 +203,4 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
         unregisterReceiver(networkChangeListener);
         super.onStop();
     }
-
-
 }

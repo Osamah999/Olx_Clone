@@ -23,8 +23,11 @@
             android:value="AIzaSyAzI_AvMs-EzpIqtdqnlIfszulGOqzgBJw" />
 
         <activity
-            android:name=".Activities.ProductDetails"
+            android:name=".Activities.AddToCart"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Activities.ProductDetails"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activities.EditProduct"
             android:screenOrientation="portrait" />
