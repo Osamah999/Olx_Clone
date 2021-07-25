@@ -3,7 +3,7 @@ package com.example.forsaleApp;
 public class ModelProduct
 {
     private String Name, Email,Password, ProductId, ProductImage, ProductName, ProductCategory, ProductDescription, ProductPrice,
-            Latitude, Longitude, Country, State, City, Location, Date, timestamp, UserId, Uid;
+            Latitude, Longitude, Country, State, City, Location, Date, timestamp, UserId,UserName, Uid;
 
     public ModelProduct()
     {
@@ -13,7 +13,7 @@ public class ModelProduct
     public ModelProduct(String name, String email, String password, String productId, String productImage,
                         String productName, String productCategory, String productDescription, String productPrice,
                         String latitude, String longitude, String country, String state, String city, String location,
-                        String date, String timestamp, String userId, String uid)
+                        String date, String timestamp, String userId, String userName, String uid)
     {
         Name = name;
         Email = email;
@@ -33,7 +33,16 @@ public class ModelProduct
         Date = date;
         this.timestamp = timestamp;
         UserId = userId;
+        UserName = userName;
         Uid = uid;
+    }
+
+    public String getUserName() {
+        return UserName;
+    }
+
+    public void setUserName(String userName) {
+        UserName = userName;
     }
 
     public String getName() {

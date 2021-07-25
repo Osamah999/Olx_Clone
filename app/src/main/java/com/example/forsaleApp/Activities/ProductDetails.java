@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.forsaleApp.Fragments.ChatFragment;
 import com.example.forsaleApp.R;
 import com.example.forsaleApp.Utility.NetworkChangeListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -48,7 +50,7 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
     private ImageView Product_Image;
     private Button Chat_btn, Favorite_btn;
 
-    private String ProductId, ProductImage, Latitude, Longitude, UserId;
+    private String ProductId, ProductImage, Latitude, Longitude, UserId,UserName;
 
     private ProgressDialog progressDialog;
     private FirebaseAuth firebaseAuth;
@@ -82,6 +84,7 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
         Latitude = getIntent().getStringExtra("Latitude");
         Longitude = getIntent().getStringExtra("Longitude");
         UserId = getIntent().getStringExtra("UserId");
+        UserName = getIntent().getStringExtra("UserName");
 
         firebaseAuth = FirebaseAuth.getInstance();
         progressDialog = new ProgressDialog(this);
@@ -90,8 +93,17 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
 
         Favorite_btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 AddToCart();
+            }
+        });
+
+        Chat_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                Chat();
             }
         });
     }
@@ -220,6 +232,47 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
                         progressDialog.dismiss();
                     }
                 });
+    }
+
+
+    private void Chat()
+    {
+        progressDialog.setTitle("Add to favorite");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setMessage("Please wait we are adding the product...");
+        progressDialog.show();
+
+        Pname = Product_Name.getText().toString().trim();
+        Description = Product_Description.getText().toString().trim();
+        Price = Product_Price.getText().toString().trim();
+        Location = Product_Location.getText().toString().trim();
+        userName = User_Name.getText().toString().trim();
+        ProductDate = date.getText().toString().trim();
+
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("ProductId", "" + ProductId);
+        hashMap.put("Receiver", "" + UserId);
+        hashMap.put("Sender", "" + firebaseAuth.getUid());
+        hashMap.put("UserName", ""+ userName);
+        //add to db
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+        reference.child(firebaseAuth.getUid()).child("Chat").child(ProductId).setValue(hashMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        progressDialog.dismiss();
+                        Toast.makeText(ProductDetails.this, "Product added successfully!", Toast.LENGTH_LONG).show();
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+                        //failed adding to db
+                        progressDialog.dismiss();
+                    }
+                });
+
     }
 
     NetworkChangeListener networkChangeListener = new NetworkChangeListener();

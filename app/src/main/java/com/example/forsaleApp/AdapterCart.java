@@ -50,6 +50,7 @@ public class AdapterCart extends RecyclerView.Adapter<AdapterCart.HolderCart>
         String productCategory = modelProduct.getProductCategory();
         String productPrice = modelProduct.getProductPrice();
         String timestamp = modelProduct.getTimestamp();
+        String UserName = modelProduct.getUserName();
         String Date = modelProduct.getDate();
         String uid = modelProduct.getUid();
 
@@ -69,6 +70,7 @@ public class AdapterCart extends RecyclerView.Adapter<AdapterCart.HolderCart>
             Intent intent = new Intent(context, AddToCart.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("ProductId", id);
+            intent.putExtra("UserName", UserName);
             context.startActivity(intent);
         });
     }
