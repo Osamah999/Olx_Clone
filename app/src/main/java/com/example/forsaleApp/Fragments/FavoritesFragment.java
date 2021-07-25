@@ -69,7 +69,7 @@ public class FavoritesFragment extends Fragment {
                             productList.add(modelProduct);
                         }
                         //set adapter
-                        adapterCart = new AdapterCart(getContext().getApplicationContext(), productList);
+                        adapterCart = new AdapterCart(getContext(), productList);
                         //set adapter
                         productRCV.setAdapter(adapterCart);
                     }

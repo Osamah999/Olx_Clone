@@ -179,15 +179,16 @@
 
             <fragment
                 android:id="@+id/googel_map"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                class="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="20dp"
+                android:layout_height="200dp"
                 android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 map:uiScrollGestures="false"
-                map:uiZoomGestures="false" />
+                map:uiZoomGestures="false"
+                class="com.google.android.gms.maps.SupportMapFragment"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                />
 
         </LinearLayout>
 

@@ -45,6 +45,7 @@ public class ModelProduct
         UserName = userName;
     }
 
+
     public String getName() {
         return Name;
     }

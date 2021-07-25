@@ -35,6 +35,8 @@ public class ChatFragment extends Fragment {
     public ArrayList<ModelProduct> productList;
     public UserAdapter userAdapter;
 
+    private String UserName, UserId;
+
     public ChatFragment(){
 
     }
@@ -48,6 +50,7 @@ public class ChatFragment extends Fragment {
         Recycler_view = view.findViewById(R.id.recycler_view);
 
         firebaseAuth = FirebaseAuth.getInstance();
+
 
         loadAllUsers();
 
@@ -72,7 +75,7 @@ public class ChatFragment extends Fragment {
                             productList.add(modelProduct);
                         }
                         //set adapter
-                        userAdapter = new UserAdapter(getContext().getApplicationContext(), productList);
+                        userAdapter = new UserAdapter(getContext(), productList);
                         //set adapter
                         Recycler_view.setAdapter(userAdapter);
                     }

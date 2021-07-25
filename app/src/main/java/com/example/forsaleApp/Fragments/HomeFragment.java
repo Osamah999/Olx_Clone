@@ -148,7 +148,7 @@ public class HomeFragment extends Fragment {
 
                         }
                         //set adapter
-                        adapterHomeProducts = new AdapterHomeProducts(getContext().getApplicationContext(), productList);
+                        adapterHomeProducts = new AdapterHomeProducts(getContext(), productList);
                         //set adapter
                         productRCV.setAdapter(adapterHomeProducts);
                     }
@@ -178,7 +178,7 @@ public class HomeFragment extends Fragment {
                             productList.add(modelProduct);
                         }
                         //set adapter
-                        adapterHomeProducts = new AdapterHomeProducts(getContext().getApplicationContext(), productList);
+                        adapterHomeProducts = new AdapterHomeProducts(getContext(), productList);
                         //set adapter
                         productRCV.setAdapter(adapterHomeProducts);
                     }

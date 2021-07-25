@@ -70,7 +70,7 @@ public class ProductsFragment extends Fragment {
                             productList.add(modelProduct);
                         }
                         //set adapter
-                        adapterProductSeller = new AdapterProductSeller(getContext().getApplicationContext(), productList);
+                        adapterProductSeller = new AdapterProductSeller(getContext(), productList);
                         //set adapter
                         productRCV.setAdapter(adapterProductSeller);
                     }

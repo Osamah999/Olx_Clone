@@ -57,7 +57,7 @@ public class AdapterCart extends RecyclerView.Adapter<AdapterCart.HolderCart>
         //set data
         holder.product_Name.setText(productName);
         holder.product_Description.setText(productDescription);
-        holder.product_Price.setText("₹"+productPrice);
+        holder.product_Price.setText(productPrice);
         holder.date.setText(Date);
         try {
             Picasso.get().load(productImage).placeholder(R.drawable.add_image).into(holder.productImage);

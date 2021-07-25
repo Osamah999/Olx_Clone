@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.forsaleApp.Activities.ChatActivity;
 import com.example.forsaleApp.Activities.ProductDetails;
 import com.squareup.picasso.Picasso;
 
@@ -76,9 +77,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>
 
         holder.itemView.setOnClickListener(view -> {
             //handle item click, show item details
-            Intent intent = new Intent(context, ProductDetails.class);
+            Intent intent = new Intent(context, ChatActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("ProductId", id);
+            intent.putExtra("UserId", userid);
+            intent.putExtra("UserName", userName);
             context.startActivity(intent);
         });
 

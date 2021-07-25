@@ -256,12 +256,15 @@ public class ProductDetails extends AppCompatActivity implements OnMapReadyCallb
         hashMap.put("UserName", ""+ userName);
         //add to db
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-        reference.child(firebaseAuth.getUid()).child("Chat").child(ProductId).setValue(hashMap)
+        reference.child(firebaseAuth.getUid()).child("Chat").child(UserId).setValue(hashMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
                         progressDialog.dismiss();
-                        Toast.makeText(ProductDetails.this, "Product added successfully!", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(ProductDetails.this, ChatActivity.class);
+                        intent.putExtra("UserId", UserId);
+                        intent.putExtra("UserName", UserName);
+                        startActivity(intent);
 
                     }
                 })
