@@ -1,4 +1,4 @@
-package com.example.forsaleApp;
+package com.example.forsaleApp.Adapters;
 
 import android.content.Context;
 import android.view.View;
@@ -13,8 +13,8 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 
 import com.example.forsaleApp.Activities.AddToCart;
-import com.example.forsaleApp.Activities.EditProduct;
-import com.example.forsaleApp.Activities.ProductDetails;
+import com.example.forsaleApp.ModelProduct;
+import com.example.forsaleApp.R;
 import com.squareup.picasso.Picasso;
 public class AdapterCart extends RecyclerView.Adapter<AdapterCart.HolderCart>
 {

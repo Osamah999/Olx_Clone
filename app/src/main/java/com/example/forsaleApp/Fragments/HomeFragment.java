@@ -15,9 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.forsaleApp.AdapterHomeProducts;
+import com.example.forsaleApp.Adapters.AdapterHomeProducts;
 import com.example.forsaleApp.Constants;
 import com.example.forsaleApp.ModelProduct;
 import com.example.forsaleApp.R;
@@ -31,7 +33,6 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 
 public class HomeFragment extends Fragment {
@@ -40,8 +41,9 @@ public class HomeFragment extends Fragment {
     private ImageButton filterbtn;
     private TextView filtertxt;
     private RecyclerView productRCV;
-
-    private FirebaseAuth firebaseAuth;
+    private TextView emptyView;
+    private ImageView NoDataImage;
+    private ProgressBar progressBar;
 
     public ArrayList<ModelProduct> productList;
     public AdapterHomeProducts adapterHomeProducts;
@@ -60,8 +62,11 @@ public class HomeFragment extends Fragment {
         filterbtn = view.findViewById(R.id.filter_btn);
         filtertxt = view.findViewById(R.id.filter_producttxt);
         productRCV = view.findViewById(R.id.product_rcv);
+        emptyView = view.findViewById(R.id.empty_view);
+        NoDataImage = view.findViewById(R.id.No_data_image);
+        progressBar = view.findViewById(R.id.progressBar);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        progressBar.setVisibility(View.VISIBLE);
 
         loadAllProducts();
 
@@ -115,7 +120,7 @@ public class HomeFragment extends Fragment {
 
                             }
                         })
-                .show();
+                        .show();
             }
         });
 
@@ -151,6 +156,18 @@ public class HomeFragment extends Fragment {
                         adapterHomeProducts = new AdapterHomeProducts(getContext(), productList);
                         //set adapter
                         productRCV.setAdapter(adapterHomeProducts);
+                        progressBar.setVisibility(View.GONE);
+
+                        if (productList.isEmpty()) {
+                            productRCV.setVisibility(View.GONE);
+                            NoDataImage.setVisibility(View.VISIBLE);
+                            emptyView.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            productRCV.setVisibility(View.VISIBLE);
+                            NoDataImage.setVisibility(View.GONE);
+                            emptyView.setVisibility(View.GONE);
+                        }
                     }
 
                     @Override
@@ -181,6 +198,18 @@ public class HomeFragment extends Fragment {
                         adapterHomeProducts = new AdapterHomeProducts(getContext(), productList);
                         //set adapter
                         productRCV.setAdapter(adapterHomeProducts);
+                        progressBar.setVisibility(View.GONE);
+
+                        if (productList.isEmpty()) {
+                            productRCV.setVisibility(View.GONE);
+                            NoDataImage.setVisibility(View.VISIBLE);
+                            emptyView.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            productRCV.setVisibility(View.VISIBLE);
+                            NoDataImage.setVisibility(View.GONE);
+                            emptyView.setVisibility(View.GONE);
+                        }
                     }
 
                     @Override

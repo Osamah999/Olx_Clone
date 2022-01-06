@@ -9,9 +9,8 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TableLayout;
 
-import com.example.forsaleApp.FragmentAdapter;
+import com.example.forsaleApp.Adapters.FragmentAdapter;
 import com.example.forsaleApp.R;
 import com.google.android.material.tabs.TabLayout;
 

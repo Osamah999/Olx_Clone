@@ -2,6 +2,8 @@ package com.example.forsaleApp;
 
 import android.widget.Filter;
 
+import com.example.forsaleApp.Adapters.AdapterHomeProducts;
+
 import java.util.ArrayList;
 
 public class FilterProduct extends Filter {

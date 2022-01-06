@@ -1,48 +1,52 @@
-package com.example.forsaleApp;
+package com.example.forsaleApp.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.forsaleApp.Activities.ChatActivity;
 import com.example.forsaleApp.Activities.ProductDetails;
+import com.example.forsaleApp.FilterProduct;
+import com.example.forsaleApp.ModelProduct;
+import com.example.forsaleApp.R;
 import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>
+public class AdapterHomeProducts extends RecyclerView.Adapter<AdapterHomeProducts.HolderHomeProducts> implements Filterable
 {
     private final Context context;
-    public ArrayList<ModelProduct> productList;
+    public ArrayList<ModelProduct> productList, filterList;
+    private FilterProduct filter;
 
-
-    public UserAdapter(Context context, ArrayList<ModelProduct> productList){
+    public AdapterHomeProducts(Context context, ArrayList<ModelProduct> productList) {
         this.context = context;
         this.productList = productList;
-
+        this.filterList = productList;
     }
 
     @NonNull
     @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.users_lists, parent, false);
-        return new UserAdapter.ViewHolder(view);
+    public HolderHomeProducts onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType)
+    {
+        //inflate layout
+        View view = LayoutInflater.from(context).inflate(R.layout.row_home_products, parent, false);
+        return new HolderHomeProducts(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull UserAdapter.ViewHolder holder, int position) {
-
+    public void onBindViewHolder(@NonNull @NotNull AdapterHomeProducts.HolderHomeProducts holder, int position)
+    {
         //get data
         final ModelProduct modelHomeProducts = productList.get(position);
         String name = modelHomeProducts.getName();
@@ -65,26 +69,28 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>
 
 
         //set data
-        holder.username.setText(userName);
-        /*holder.product_Description.setText(productDescription);
+        holder.product_Name.setText(productName);
+        holder.product_Description.setText(productDescription);
         holder.product_Price.setText("₹"+productPrice);
         holder.date.setText(Date);
         try {
             Picasso.get().load(productImage).placeholder(R.drawable.add_image).into(holder.productImage);
         }catch (Exception e){
             holder.productImage.setImageResource(R.drawable.add_image);
-        }*/
+        }
 
         holder.itemView.setOnClickListener(view -> {
             //handle item click, show item details
-            Intent intent = new Intent(context, ChatActivity.class);
+            Intent intent = new Intent(context, ProductDetails.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("ProductId", id);
+            intent.putExtra("Latitude", latitude);
+            intent.putExtra("Longitude", longitude);
             intent.putExtra("UserId", userid);
             intent.putExtra("UserName", userName);
+            intent.putExtra("ProductImage", productImage);
             context.startActivity(intent);
         });
-
 
     }
 
@@ -93,17 +99,32 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>
         return productList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    @Override
+    public Filter getFilter() {
+        if (filter == null)
+        {
+            filter = new FilterProduct(this, filterList);
+        }
+        return filter;
+    }
 
-        public TextView username;
-        public ImageView profile_image;
+    static class HolderHomeProducts extends RecyclerView.ViewHolder
+    {
+        private final ImageView productImage;
+        private final TextView product_Name;
+        private final TextView product_Description;
+        private final TextView product_Price;
+        private final TextView date;
 
-
-        public ViewHolder(@NonNull @NotNull View itemView) {
+        public HolderHomeProducts(@NonNull @NotNull View itemView) {
             super(itemView);
 
-            username = itemView.findViewById(R.id.username);
-            profile_image = itemView.findViewById(R.id.profile_image);
+            productImage = itemView.findViewById(R.id.product_image);
+            product_Name = itemView.findViewById(R.id.product_name);
+            product_Description = itemView.findViewById(R.id.product_description);
+            product_Price = itemView.findViewById(R.id.product_price);
+            date = itemView.findViewById(R.id.date);
+
         }
     }
 }

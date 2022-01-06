@@ -51,10 +51,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/AppBarLayout"
+        android:layout_above="@+id/relative_la"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         />
 
     <RelativeLayout
+        android:id="@+id/relative_la"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

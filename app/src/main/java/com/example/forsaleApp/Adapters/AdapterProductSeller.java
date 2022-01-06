@@ -1,4 +1,4 @@
-package com.example.forsaleApp;
+package com.example.forsaleApp.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.forsaleApp.Activities.EditProduct;
+import com.example.forsaleApp.ModelProduct;
+import com.example.forsaleApp.R;
 import com.squareup.picasso.Picasso;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
@@ -47,6 +49,8 @@ public class AdapterProductSeller extends RecyclerView.Adapter<AdapterProductSel
         String productDescription = modelProduct.getProductDescription();
         String productCategory = modelProduct.getProductCategory();
         String productPrice = modelProduct.getProductPrice();
+        String Latitude = modelProduct.getLatitude();
+        String Longitude = modelProduct.getLongitude();
         String timestamp = modelProduct.getTimestamp();
         String Date = modelProduct.getDate();
         String uid = modelProduct.getUid();
@@ -67,6 +71,8 @@ public class AdapterProductSeller extends RecyclerView.Adapter<AdapterProductSel
             Intent intent = new Intent(context, EditProduct.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("ProductId", id);
+            intent.putExtra("Latitude", Latitude);
+            intent.putExtra("Longitude", Longitude);
             context.startActivity(intent);
         });
 

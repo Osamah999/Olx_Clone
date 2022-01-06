@@ -3,7 +3,7 @@ package com.example.forsaleApp;
 public class ModelProduct
 {
     private String Name, Email,Password, ProductId, ProductImage, ProductName, ProductCategory, ProductDescription, ProductPrice,
-            Latitude, Longitude, Country, State, City, Location, Date, timestamp, UserId,UserName, Uid;
+            Latitude, Longitude, Country, State, City, Location, Date, timestamp, UserId,UserName, Uid, Sender, Receiver, Message;
 
     public ModelProduct()
     {
@@ -13,7 +13,7 @@ public class ModelProduct
     public ModelProduct(String name, String email, String password, String productId, String productImage,
                         String productName, String productCategory, String productDescription, String productPrice,
                         String latitude, String longitude, String country, String state, String city, String location,
-                        String date, String timestamp, String userId, String userName, String uid)
+                        String date, String timestamp, String userId, String userName, String uid, String sender, String receiver, String message)
     {
         Name = name;
         Email = email;
@@ -35,6 +35,9 @@ public class ModelProduct
         UserId = userId;
         UserName = userName;
         Uid = uid;
+        Sender = sender;
+        Receiver = receiver;
+        Message = message;
     }
 
     public String getUserName() {
@@ -196,5 +199,29 @@ public class ModelProduct
 
     public void setUserId(String userId) {
         UserId = userId;
+    }
+
+    public String getReceiver() {
+        return Receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        Receiver = receiver;
+    }
+
+    public String getSender() {
+        return Sender;
+    }
+
+    public void setSender(String sender) {
+        Sender = sender;
+    }
+
+    public String getMessage() {
+        return Message;
+    }
+
+    public void setMessage(String message) {
+        Message = message;
     }
 }

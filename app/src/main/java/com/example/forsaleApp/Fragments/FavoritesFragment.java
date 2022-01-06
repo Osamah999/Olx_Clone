@@ -9,9 +9,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import com.example.forsaleApp.AdapterCart;
-import com.example.forsaleApp.AdapterProductSeller;
+import com.example.forsaleApp.Adapters.AdapterCart;
 import com.example.forsaleApp.ModelProduct;
 import com.example.forsaleApp.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,9 +30,12 @@ import java.util.ArrayList;
 public class FavoritesFragment extends Fragment {
 
     private RecyclerView productRCV;
+    private TextView emptyView;
+    private ImageView NoDataImage;
     private FirebaseAuth firebaseAuth;
     private ArrayList<ModelProduct> productList;
     private AdapterCart adapterCart;
+    private ProgressBar progressBar;
 
     public FavoritesFragment(){
 
@@ -43,8 +48,12 @@ public class FavoritesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_favorites, container, false);
 
         productRCV = view.findViewById(R.id.product_rcv);
+        emptyView = view.findViewById(R.id.empty_view);
+        NoDataImage = view.findViewById(R.id.No_data_image);
+        progressBar = view.findViewById(R.id.progressBar);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        progressBar.setVisibility(View.VISIBLE);
         loadAllProducts();
 
         return view;
@@ -72,6 +81,18 @@ public class FavoritesFragment extends Fragment {
                         adapterCart = new AdapterCart(getContext(), productList);
                         //set adapter
                         productRCV.setAdapter(adapterCart);
+                        progressBar.setVisibility(View.GONE);
+
+                        if (productList.isEmpty()) {
+                            productRCV.setVisibility(View.GONE);
+                            NoDataImage.setVisibility(View.VISIBLE);
+                            emptyView.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            productRCV.setVisibility(View.VISIBLE);
+                            NoDataImage.setVisibility(View.GONE);
+                            emptyView.setVisibility(View.GONE);
+                        }
                     }
 
                     @Override

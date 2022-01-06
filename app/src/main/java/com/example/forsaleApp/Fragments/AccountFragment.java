@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.forsaleApp.Activities.MainActivity;
@@ -35,6 +36,7 @@ public class AccountFragment extends Fragment {
     private FirebaseUser user;
     private DatabaseReference reference;
     private String userID;
+    private ProgressBar progressBar;
 
     public AccountFragment(){
 
@@ -44,7 +46,7 @@ public class AccountFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-       final View view =  inflater.inflate(R.layout.fragment_account, container, false);
+        final View view =  inflater.inflate(R.layout.fragment_account, container, false);
 
         logout = view.findViewById(R.id.logout_txt);
         resetPassword = view.findViewById(R.id.reset_txt);
@@ -52,12 +54,14 @@ public class AccountFragment extends Fragment {
         userEmailD = view.findViewById(R.id.user_email_down);
         userNameU = view.findViewById(R.id.user_name_up);
         userEmailU = view.findViewById(R.id.user_email_up);
+        progressBar = view.findViewById(R.id.progressBar);
 
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("users");
         userID = user.getUid();
 
+        progressBar.setVisibility(View.VISIBLE);
         reference.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -71,6 +75,7 @@ public class AccountFragment extends Fragment {
                     userEmailU.setText(email);
                     userNameD.setText(fullName);
                     userEmailD.setText(email);
+                    progressBar.setVisibility(View.GONE);
                 }
             }
 
